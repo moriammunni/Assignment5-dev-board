@@ -1,21 +1,20 @@
 document.addEventListener("DOMContentLoaded", function () {
     const taskButtons = document.querySelectorAll(".btn-primary:not(.clear-btn)");
-    let totalTasks = taskButtons.length;
+    const taskCount = document.getElementById("task-count");
+    const navbarCount = document.getElementById("navbar-count");
+    const activityLog = document.getElementById("activity-log");
+    const clearHistoryBtn = document.querySelector(".clear-btn");
 
-    taskButtons.forEach(button => {
+    document.getElementById("current-date").innerHTML = new Date().toLocaleDateString("en-US", {
+        weekday: "short", month: "short", day: "numeric", year: "numeric"
+    }).replace(",", "<br>");
+
+    taskButtons.forEach((button, index) => {
         button.addEventListener("click", function () {
             alert("Board Updated Successfully");
 
-            const taskCount = document.getElementById("task-count");
             let currentCount = parseInt(taskCount.innerText);
-
-            if (currentCount > 1) {
-                taskCount.innerText = currentCount - 1;
-            } else {
-                taskCount.innerText = "No Tasks Left";
-            }
-
-            const navbarCount = document.getElementById("navbar-count");
+            taskCount.innerText = currentCount > 1 ? currentCount - 1 : "No Tasks Left";
             navbarCount.innerText = parseInt(navbarCount.innerText) + 1;
 
             button.disabled = true;
@@ -24,22 +23,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const taskTitle = button.closest(".card").querySelector(".task-title").innerText;
             const currentTime = new Date().toLocaleTimeString();
-
-            const activityLog = document.getElementById("activity-log");
             const logEntry = document.createElement("p");
+            logEntry.classList.add("completed-task-log"); // Added class to identify completed tasks
+            logEntry.style.backgroundColor = "gray";
+            logEntry.style.padding = "8px";
+            logEntry.style.borderRadius = "5px";
+            logEntry.style.marginTop = "5px";
             logEntry.innerText = `You have completed the task: "${taskTitle}" at ${currentTime}`;
             activityLog.appendChild(logEntry);
+
+            if (document.querySelectorAll(".btn-primary:not(.clear-btn):not([disabled])").length === 0) {
+                setTimeout(() => {
+                    alert(" Congratulations!!!! You have completed all tasks??");
+                }, 500);
+            }
         });
     });
 
-
-    const clearHistoryBtn = document.querySelector(".clear-btn");
     clearHistoryBtn.addEventListener("click", function () {
-        const confirmDelete = confirm("Are you sure you want to clear the activity log?");
-
-        if (confirmDelete) {
-            const activityLog = document.getElementById("activity-log");
-            activityLog.querySelectorAll("p").forEach(log => log.remove());
+        if (confirm("Are you sure you want to clear the completed tasks?")) {
+            document.querySelectorAll(".completed-task-log").forEach(log => log.remove());
         }
     });
 });
